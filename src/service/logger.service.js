@@ -26,4 +26,14 @@ if (process.env.NODE_ENV !== 'production') {
     }));
 }
 
-module.exports = { logger };
+function logError(err, req, res, next) {
+    logger.error(err);
+    next();
+}
+
+function logRequest(req, res, next) {
+    logger.info(req.url);
+    next();
+}
+
+module.exports = { logger, logError, logRequest };

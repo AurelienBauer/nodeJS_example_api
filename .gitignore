@@ -7,3 +7,6 @@ node_modules
 .env
 .env.test
 package-lock.json
+
+server.cert
+server.key
