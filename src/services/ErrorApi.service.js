@@ -21,3 +21,4 @@ export class ErrorApi extends Error{
         this.stack = stack;
     }
 }
+
