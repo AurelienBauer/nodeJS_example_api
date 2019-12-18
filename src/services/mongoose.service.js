@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 import { logger } from  './logger.service';
 
+// print mongoose logs in dev env
+if (process.env.NODE_ENV === 'development') {
+    mongoose.set('debug', true);
+}
+
 const connectDb = () => {
     return mongoose.connect(process.env.MONGO_HOST,
         {

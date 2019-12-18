@@ -3,10 +3,11 @@ import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { connectDb } from  './service/mongoose.service'
-import { logger, logError, logRequest } from  './service/logger.service';
+import { connectDb } from './services/mongoose.service'
+import { logger, logError, logRequest } from './services/logger.service';
 import https from 'https';
 import fs from 'fs';
+import route from './routes'
 
 const app = express();
 
@@ -21,6 +22,13 @@ app.use(bodyParser.json({
 app.use(logError);
 
 app.use(logRequest);
+
+app.use('/', route);
+
+if (!fs.existsSync("server.key") || !fs.existsSync("server.cert")) {
+    console.warn("API didn't find SSL files.");
+    process.exit(1);
+}
 
 const options = {
     key: fs.readFileSync("server.key"),
