@@ -7,9 +7,6 @@ const router = Router();
 router.route('/login')
     .post(controller.login);
 
-router.route('/register')
-    .post(controller.register);
-
 router.route('/status')
     .get(
         checkToken,

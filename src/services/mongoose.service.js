@@ -14,7 +14,7 @@ const connectDb = () => {
         },
         (err) => {
             if (!err) {
-                logger.info(`HELPDESK_CLIENT_API - Connected to mongoDB ${process.env.MONGO_HOST}.`);
+                logger.info(`BLANK_API - Connected to mongoDB ${process.env.MONGO_HOST}.`);
             } else {
                 logger.error(`MongoDB connection error: ${err}`);
                 setTimeout(connectDb, 5000)

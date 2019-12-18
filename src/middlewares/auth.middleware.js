@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
 import httpStatus from "http-status";
+import {ErrorApi} from "../services/ErrorApi.service";
+import {UserModel} from "../models/user.model";
 
 const checkToken = (req, res, next) => {
     let token = req.headers['x-access-token'] || req.headers['authorization'];
@@ -8,27 +10,23 @@ const checkToken = (req, res, next) => {
     }
 
     if (token) {
-        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
             if (err) {
-                return res
-                    .status(httpStatus.UNAUTHORIZED)
-                    .json({
-                    success: false,
+                return next(new ErrorApi({
+                    status: httpStatus.UNAUTHORIZED,
                     message: 'Token is not valid'
-                });
+                }));
             } else {
-                req.decoded = decoded;
-                console.dir(decoded);
+                const user = await UserModel.getUserByEmail(decoded.email);
+                req.user = user;
                 next();
             }
         });
     } else {
-        return res
-            .status(httpStatus.UNAUTHORIZED)
-            .json({
-            success: false,
+        return next(new ErrorApi({
+            status: httpStatus.UNAUTHORIZED,
             message: 'Auth token is not supplied'
-        });
+        }));
     }
 };
 

@@ -8,6 +8,7 @@ import { logger, logError, logRequest } from './services/logger.service';
 import https from 'https';
 import fs from 'fs';
 import route from './routes'
+import {notFound, handler} from "./middlewares/error.middleware";
 
 const app = express();
 
@@ -19,11 +20,13 @@ app.use(bodyParser.json({
     limit: '300kb',
 }));
 
-app.use(logError);
-
 app.use(logRequest);
 
 app.use('/', route);
+
+app.use(notFound);
+
+app.use(handler);
 
 if (!fs.existsSync("server.key") || !fs.existsSync("server.cert")) {
     console.warn("API didn't find SSL files.");
@@ -44,3 +47,5 @@ const runServer = () => https.createServer(options, app).listen(process.env.PORT
 
 connectDb();
 runServer();
+
+

@@ -27,6 +27,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 function logError(err, req, res, next) {
+    console.dir(err);
     logger.error(err);
     next();
 }
