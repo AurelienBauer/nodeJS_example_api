@@ -4,9 +4,11 @@
   "description": "A model that contain a basic authentication with token and refresh token",
   "main": "app.js",
   "scripts": {
+    "precommit": "npm run lint",
+    "prepush": "npm run test",
     "start": "nodemon --exec babel-node src/app.js",
-    "test": "DEV_ENV=.env.test mocha --timeout 30000 ./test/**/*.js --exit",
-    "lint": "npm lint:sources && npm lint:test",
+    "test": "NODE_ENV=test mocha --require @babel/register --timeout 30000 ./test/**/*.js --exit",
+    "lint": "npm run lint:sources && npm run lint:test",
     "lint:test": "./node_modules/eslint/bin/eslint.js 'test/**/**.js'",
     "lint:sources": "./node_modules/eslint/bin/eslint.js 'src/**/**.js'"
   },
@@ -32,9 +34,9 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.7.5",
+    "@babel/core": "^7.7.7",
     "@babel/node": "^7.7.4",
-    "@babel/preset-env": "^7.7.6",
+    "@babel/preset-env": "^7.7.7",
     "@babel/register": "^7.7.4",
     "chai": "^4.2.0",
     "eslint": "^6.7.2",

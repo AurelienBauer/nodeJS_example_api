@@ -13,7 +13,7 @@ const connectDb = () => mongoose.connect(process.env.MONGO_HOST,
   },
   (err) => {
     if (!err) {
-      logger.info(`BLANK_API - Connected to mongoDB ${process.env.MONGO_HOST}.`);
+      logger.info(`${process.env.PROJECT_NAME} - Connected to mongoDB ${process.env.MONGO_HOST}.`);
     } else {
       logger.error(`MongoDB connection error: ${err}`);
       setTimeout(connectDb, 5000);

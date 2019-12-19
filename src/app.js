@@ -39,7 +39,7 @@ const options = {
 };
 
 const runServer = () => https.createServer(options, app).listen(process.env.PORT, () => {
-  logger.info(`HELPDESK_CLIENT_API - Server started on port ${process.env.PORT} (${process.env.NODE_ENV}).`);
+  logger.info(`${process.env.PROJECT_NAME} - Server started on port ${process.env.PORT} (${process.env.NODE_ENV}).`);
 }).on('error', (err) => {
   logger.error(`Launch server error: ${err}`);
   setTimeout(runServer, 5000);
@@ -47,3 +47,5 @@ const runServer = () => https.createServer(options, app).listen(process.env.PORT
 
 connectDb();
 runServer();
+
+export default app;
