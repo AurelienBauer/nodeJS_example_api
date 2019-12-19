@@ -3,5 +3,5 @@
   "version": "0.1.0",
   "description": "apiDoc for blank api documentation",
   "title": "Blank API documentation",
-  "url" : "https://localhost/api/doc"
+  "url" : "https://{{URL}}"
 }

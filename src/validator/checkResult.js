@@ -6,7 +6,7 @@ const checkResult = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(new ErrorApi({
-      status: httpStatus.FORBIDDEN,
+      status: httpStatus.BAD_REQUEST,
       message: 'Validation error',
       errors: errors.array(),
     }));

@@ -13,7 +13,7 @@ describe('Authentication API Integration Tests', () => {
       agent.post('/auth/login')
         .set('Accept', 'application/json')
         .end((err, res) => {
-          expect(res.statusCode).to.equal(httpStatus.FORBIDDEN);
+          expect(res.statusCode).to.equal(httpStatus.BAD_REQUEST);
           expect(res.body).to.be.an('object');
           expect(res.body.errors).to.be.an('array');
           expect(res.body.errors.length).to.equal(2);
@@ -30,7 +30,7 @@ describe('Authentication API Integration Tests', () => {
           password: 'good password',
         })
         .end((err, res) => {
-          expect(res.statusCode).to.equal(httpStatus.FORBIDDEN);
+          expect(res.statusCode).to.equal(httpStatus.BAD_REQUEST);
           expect(res.body).to.be.an('object');
           expect(res.body.errors).to.be.an('array');
           expect(res.body.errors.length).to.equal(1);
@@ -49,7 +49,7 @@ describe('Authentication API Integration Tests', () => {
           password: 'short',
         })
         .end((err, res) => {
-          expect(res.statusCode).to.equal(httpStatus.FORBIDDEN);
+          expect(res.statusCode).to.equal(httpStatus.BAD_REQUEST);
           expect(res.body).to.be.an('object');
           expect(res.body.errors).to.be.an('array');
           expect(res.body.errors.length).to.equal(1);
@@ -70,7 +70,8 @@ describe('Authentication API Integration Tests', () => {
         .end((err, res) => {
           expect(res.statusCode).to.equal(httpStatus.OK);
           expect(res.body).to.be.an('object');
-          expect(res.body.token).to.be.a('string');
+          expect(res.body.token).to.be.an('object');
+          expect(res.body.token.access_token).to.be.a('string');
           expect(res.body.success).to.equal(true);
           done();
         });
@@ -88,7 +89,7 @@ describe('Authentication API Integration Tests', () => {
           password: 'goodpassword',
         })
         .end((err, res) => {
-          token = res.body.token;
+          token = res.body.token.access_token;
         });
     });
 

@@ -17,9 +17,11 @@ exports.login = (req, res, next) => {
 
     return res.status(httpStatus.OK)
       .json({
-        token,
+        token: {
+          access_token: token,
+          expired_in: process.env.JWT_EXPIRATION_DELAY,
+        },
         message: 'Authentication successful!',
-        expired_in: process.env.JWT_EXPIRATION_DELAY,
         success: true,
       });
   } catch (err) {
