@@ -10,7 +10,9 @@
     "test": "NODE_ENV=test mocha --require @babel/register --timeout 30000 ./test/**/*.js --exit",
     "lint": "npm run lint:sources && npm run lint:test",
     "lint:test": "./node_modules/eslint/bin/eslint.js 'test/**/**.js'",
-    "lint:sources": "./node_modules/eslint/bin/eslint.js 'src/**/**.js'"
+    "lint:sources": "./node_modules/eslint/bin/eslint.js 'src/**/**.js'",
+    "docs": "apidoc -i src -o doc",
+    "postdocs": "open-cli doc/index.html"
   },
   "keywords": [
     "nodeJs",
@@ -46,6 +48,7 @@
     "eslint-plugin-react": "^7.17.0",
     "mocha": "^6.2.2",
     "nodemon": "^2.0.2",
+    "open-cli": "^5.0.0",
     "supertest": "^4.0.2"
   }
 }
