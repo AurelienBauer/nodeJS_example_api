@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "airbnb"
+  ],
+  "rules": {
+    "no-console": "off",
+    "no-underscore-dangle": "off",
+    "template-curly-spacing": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "999.999.999"
+    }
+  }
+}

@@ -1,20 +1,20 @@
 import { Router } from 'express';
 import controller from '../controllers/auth.controller';
 import { checkToken } from '../middlewares/auth.middleware';
-import {loginUser} from '../validator/auth.validator';
+import validator from '../validator/auth.validator';
 
 const router = Router();
 
 router.route('/login')
-    .post(
-        loginUser,
-        controller.login
-    );
+  .post(
+    validator.loginUser,
+    controller.login,
+  );
 
 router.route('/status')
-    .get(
-        checkToken,
-        controller.status
-    );
+  .get(
+    checkToken,
+    controller.status,
+  );
 
-module.exports = router;
+export default router;
