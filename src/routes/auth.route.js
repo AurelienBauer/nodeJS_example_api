@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import controller from '../controllers/auth.controller';
 import { checkToken, checkRefreshToken } from '../middlewares/auth.middleware';
-import validator from '../validator/auth.validator';
+import { loginUser, refreshToken } from '../validator/auth.validator';
 
 const router = Router();
 
@@ -18,37 +18,87 @@ const router = Router();
  * @apiParam  {String}        email          User's email
  * @apiParam  {String {6..}}  password       User's password
  *
- * @apiSuccess  {String}  token               Token Object
- * @apiSuccess  {String}  token.accessToken   Access Token
- * @apiSuccess  {String}  token.expiresIn     Access Token's expiration delay
- * @apiSuccess  {String}  message             A message to  describe the request response status
- * @apiSuccess  {String}  success             True if the request succeed, otherwise false
+ * @apiSuccess  {Object}  tokens                        Token Object
+ * @apiSuccess  {Object}  tokens.accessToken            Access Token Object
+ * @apiSuccess  {String}  tokens.accessToken.token      Access Token
+ * @apiSuccess  {String}  tokens.accessToken.expiresIn  Access Token's expiration date
+ * @apiSuccess  {Object}  tokens.refreshToken           Refresh Token Object
+ * @apiSuccess  {String}  tokens.refreshToken.token     Refresh Token
+ * @apiSuccess  {String}  tokens.refreshToken.expiresIn Refresh Token's expiration date
+ * @apiSuccess  {String}  message                       A message to  describe the request
+ *                                                          response status
+ * @apiSuccess  {Bool}    success                       True if the request succeed, otherwise false
  *
  * @apiSuccessExample {json} Success-Response:
  * HTTP/1.1 200 OK
  * {
- *   "token": {
- *       "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJlbWFpbEBzaG9
- *       1bF9iZV91bmlxdWUuY29tIiwiaWF0IjoxNTc2NzY5ODMzLCJleHAiOjE1NzY3ODQyMzN9.6k57k9DiHYB9E9
- *       GOsJUbVdSm4pgnqg6zCWoCKgtRZOo",
- *       "expired_in": "4h"
- *   },
- *   "message": "Authentication successful!",
- *   "success": true
- * }
+ *  "tokens": {
+ *      "accessToken": {
+ *          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJlbWFpbEBzaG91bF9
+ *          iZV91bmlxdWUuY29tIiwiaWF0IjoxNTc3MTg2OTU5LCJleHAiOjMxNTQzNzM5MTh9.HBQIt65gNhJuek8V
+ *          sVWrx2c5HHcqzcYevJSoTWF-Z1I",
+ *          "expiresIn": "2019-12-24T11:29:19.497Z"
+ *      },
+ *      "refreshToken": {
+ *          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJlbWFpbEBzaG91bF9iZ
+ *          V91bmlxdWUuY29tIiwiaWF0IjoxNTc3MTg2OTU0LCJleHAiOjE1NzcxODY5NTR9.PYKMWv1zzaSQy7yIRL6t
+ *          TL8XblEZwbgLliRq7ujS96U",
+ *          "expiresIn": "2020-01-23T11:29:14.794Z"
+ *      }
+ *  },
+ *  "message": "Authentication successful!",
+ *  "success": true
+ *}
+ *
+ * @apiError (Bad Request 400)  ValidationError   Some parameters may contain invalid values
+ * @apiError (Unauthorized 401) Unauthorized      Incorrect refreshToken
+ */
+router.route('/login')
+  .post(
+    loginUser,
+    controller.login,
+  );
+
+/**
+ * @api {post} /auth/refreshToken RefreshToken
+ * @apiDescription Generate a new access token if the refresh Token sent is still valid
+ * @apiVersion 1.0.0
+ * @apiName Re-generate AccessToken
+ * @apiGroup Auth
+ * @apiPermission public
+ *
+ * @apiHeader {String}        Content-Type   application/json
+ *
+ * @apiParam  {String}        refreshToken   User's refreshToken
+ *
+ * @apiSuccess  {Object}  tokens              Token Object
+ * @apiSuccess  {String}  tokens.accessToken  Access Token
+ * @apiSuccess  {String}  tokens.expiresIn    Access Token's expiration date
+ * @apiSuccess  {String}  message             A message to  describe the request response status
+ * @apiSuccess  {Bool}    success             True if the request succeed, otherwise false
+ *
+ * @apiSuccessExample {json} Success-Response:
+ * HTTP/1.1 200 OK
+ *{
+ *  "tokens": {
+ *      "accessToken": {
+ *          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJlbWFpbEBzaG91bF9
+ *          iZV91bmlxdWUuY29tIiwiaWF0IjoxNTc3MTkyMDQ5LCJleHAiOjMxNTQzODQwOTh9.lKle9qnAZUo_pRH3
+ *          WNHpgxnTK6nq-H8JrIQDgQsWF3c",
+ *          "expiresIn": "2019-12-24T12:54:09.935Z"
+ *      }
+ *  },
+ *  "message": "Regenerate accessToken successfully!",
+ *  "success": true
+ *}
  *
  * @apiError (Bad Request 400)  ValidationError   Some parameters may contain invalid values
  * @apiError (Unauthorized 401) Unauthorized      Incorrect email or password
  *                                                (TO DO in file auth.controller)
  */
-router.route('/login')
-  .post(
-    validator.loginUser,
-    controller.login,
-  );
-
 router.route('/refreshToken')
   .post(
+    refreshToken,
     checkRefreshToken,
     controller.refreshToken,
   );

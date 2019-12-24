@@ -28,7 +28,7 @@ refreshTokenSchema.statics = {
         userId: id,
         expiresIn: refreshToken.expiresIn,
       }).save();
-      return { refreshToken };
+      return refreshToken;
     } catch (err) {
       if (err.name === 'MongoError' && err.code === 11000) {
         return new ErrorApi({

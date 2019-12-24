@@ -22,7 +22,7 @@ exports.login = async (req, res, next) => {
 
     return res.status(httpStatus.OK)
       .json({
-        token: {
+        tokens: {
           accessToken,
           refreshToken,
         },
@@ -39,7 +39,7 @@ exports.refreshToken = (req, res, next) => {
     const accessToken = generateAccessToken('useremail@shoul_be_unique.com');
     return res.status(httpStatus.OK)
       .json({
-        token: {
+        tokens: {
           accessToken,
         },
         message: 'Regenerate accessToken successfully!',

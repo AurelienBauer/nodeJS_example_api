@@ -10,6 +10,7 @@ const connectDb = () => mongoose.connect(process.env.MONGO_HOST,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true,
   },
   (err) => {
     if (!err) {
