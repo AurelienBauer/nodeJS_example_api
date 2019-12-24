@@ -6,7 +6,6 @@ import ErrorApi from '../services/ErrorApi.service';
  * Error handler. Send stacktrace only during development
  * @public
  */
-
 export const handler = (err, req, res, next) => {
   let error = err;
   if (!(err instanceof ErrorApi)) {

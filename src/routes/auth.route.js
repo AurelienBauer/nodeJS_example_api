@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import controller from '../controllers/auth.controller';
-import { checkToken } from '../middlewares/auth.middleware';
+import { checkToken, checkRefreshToken } from '../middlewares/auth.middleware';
 import validator from '../validator/auth.validator';
 
 const router = Router();
@@ -45,6 +45,12 @@ router.route('/login')
   .post(
     validator.loginUser,
     controller.login,
+  );
+
+router.route('/refreshToken')
+  .post(
+    checkRefreshToken,
+    controller.refreshToken,
   );
 
 /**

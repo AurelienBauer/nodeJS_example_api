@@ -1,8 +1,9 @@
-import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status';
 import ErrorApi from '../services/ErrorApi.service';
+import RefreshToken from '../models/refreshToken.model';
+import { generateAccessToken } from '../services/auth.service';
 
-exports.login = (req, res, next) => {
+exports.login = async (req, res, next) => {
   try {
     const isAuthenticated = true; /* TODO: replace by your authentication system */
     if (!isAuthenticated) {
@@ -12,16 +13,36 @@ exports.login = (req, res, next) => {
       }));
     }
 
-    const token = jwt.sign({ email: 'useremail@shoul_be_unique.com' }, process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRATION_DELAY });
+    const accessToken = generateAccessToken('useremail@shoul_be_unique.com');
+
+    const refreshToken = await RefreshToken.generateAndInsertRefreshToken({ email: 'useremail@shoul_be_unique.com' });
+    if (refreshToken instanceof ErrorApi) {
+      return next(refreshToken);
+    }
 
     return res.status(httpStatus.OK)
       .json({
         token: {
-          access_token: token,
-          expired_in: process.env.JWT_EXPIRATION_DELAY,
+          accessToken,
+          refreshToken,
         },
         message: 'Authentication successful!',
+        success: true,
+      });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+exports.refreshToken = (req, res, next) => {
+  try {
+    const accessToken = generateAccessToken('useremail@shoul_be_unique.com');
+    return res.status(httpStatus.OK)
+      .json({
+        token: {
+          accessToken,
+        },
+        message: 'Regenerate accessToken successfully!',
         success: true,
       });
   } catch (err) {
