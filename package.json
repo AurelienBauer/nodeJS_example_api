@@ -4,8 +4,6 @@
   "description": "A model that contain a basic authentication with token and refresh token",
   "main": "app.js",
   "scripts": {
-    "precommit": "npm run lint",
-    "prepush": "npm run test",
     "start": "nodemon --exec babel-node src/app.js",
     "test": "NODE_ENV=test mocha --require @babel/register --timeout 30000 ./test/**/*.js --exit",
     "lint": "npm run lint:sources && npm run lint:test",
@@ -13,6 +11,12 @@
     "lint:sources": "./node_modules/eslint/bin/eslint.js 'src/**/**.js'",
     "docs": "apidoc -i src -o doc",
     "postdocs": "open-cli doc/index.html"
+  },
+  "husky": {
+    "hooks": {
+      "precommit": "npm run lint",
+      "prepush": "npm run test"
+    }
   },
   "keywords": [
     "nodeJs",
@@ -47,6 +51,7 @@
     "eslint-plugin-import": "^2.19.1",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.17.0",
+    "husky": "^3.1.0",
     "mocha": "^6.2.2",
     "nodemon": "^2.0.2",
     "open-cli": "^5.0.0",
