@@ -8,9 +8,6 @@ stages:
   - linter
   - test
 
-services:
-  - mongo
-
 default:
   before_script:
     - npm install
@@ -18,13 +15,16 @@ default:
 lint:
   stage: linter
   script:
-  - npm run lint
+    - npm run lint
 
 integration:
   stage: test
+  services:
+    - mongo
   script:
-  - openssl genrsa -out server.key.pem 2048
-  - openssl req -new -sha256 -key server.key.pem -out server.csr.pem
-  - openssl x509 -req -in server.csr.pem -signkey server.key.pem -out server.cert.pem
-  - cp .env.example .env
-  - npm run test
+    - cp .env.example .env
+    - openssl genrsa -out server.key.pem 2048
+    - openssl req -new -sha256 -key server.key.pem -out server.csr.pem
+    - openssl x509 -req -in server.csr.pem -signkey server.key.pem -out server.cert.pem
+    - npm start
+    - npm run test
