@@ -23,7 +23,6 @@ integration:
     - mongo
   
   variables:
-    DB_HOST: 'localhost'
     MONGO_HOST: 'mongodb://localhost:27017/blank_api'
     NODE_ENV: 'test'
    
