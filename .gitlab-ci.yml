@@ -23,7 +23,7 @@ integration:
     - mongo
   
   variables:
-    MONGO_HOST: 'mongodb://localhost:27017/blank_api'
+    MONGO_HOST: 'mongodb://mongo/blank_api'
    
   script:
     - cp .env.example .env
