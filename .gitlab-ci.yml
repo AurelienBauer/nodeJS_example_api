@@ -23,9 +23,10 @@ integration:
     - mongo
   
   variables:
-    DB_HOST= 'localhost'
-    MONGO_HOST= 'mongodb://localhost:27017/blank_api'
+    DB_HOST: 'localhost'
+    MONGO_HOST: 'mongodb://localhost:27017/blank_api'
     NODE_ENV: 'test'
+   
   script:
     - cp .env.example .env
     - openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=FR/ST=France/L=_/O=_/CN=_" -keyout server.key.pem -out server.cert.pem
