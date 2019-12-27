@@ -1,0 +1,17 @@
+image: node:12
+
+stages:
+  - linter
+  - integration
+
+default:
+  before_script:
+    - npm install
+
+linter:
+  script:
+  - npm run lint
+
+integration:
+  script:
+  - npm run test
