@@ -23,8 +23,6 @@ integration:
     - mongo
   script:
     - cp .env.example .env
-    - openssl genrsa -out server.key.pem 2048
-    - openssl req -new -sha256 -key server.key.pem -out server.csr.pem
-    - openssl x509 -req -in server.csr.pem -signkey server.key.pem -out server.cert.pem
+    - openssl req     -new     -newkey rsa:4096     -days 365     -nodes     -x509     -subj "/C=FR/ST=France/L=_/O=_/CN=_"     -keyout server.key.pem -out server.cert.pem
     - npm start
     - npm run test
