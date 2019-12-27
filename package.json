@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "nodemon --exec babel-node src/app.js",
-    "test": "NODE_ENV=test mocha --require @babel/register --timeout 30000 ./test/**/*.js --exit",
+    "test": "NODE_ENV=test mocha --require @babel/register --timeout 100000 ./test/**/*.js --exit",
     "lint": "npm run lint:sources && npm run lint:test",
     "lint:test": "./node_modules/eslint/bin/eslint.js 'test/**/**.js'",
     "lint:sources": "./node_modules/eslint/bin/eslint.js 'src/**/**.js'",
