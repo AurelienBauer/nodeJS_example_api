@@ -1,17 +1,23 @@
-image: node:12
+image: node:12.13
+
+cache:
+  paths:
+    - node_modules/
 
 stages:
   - linter
-  - integration
+  - test
 
 default:
   before_script:
     - npm install
 
-linter:
+lint:
+  stage: linter
   script:
   - npm run lint
 
 integration:
+  stage: test
   script:
   - npm run test
