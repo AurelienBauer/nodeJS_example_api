@@ -20,4 +20,5 @@ lint:
 integration:
   stage: test
   script:
+  - cp .env.exemple .env
   - npm run test
