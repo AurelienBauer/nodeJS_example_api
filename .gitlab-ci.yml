@@ -8,6 +8,9 @@ stages:
   - linter
   - test
 
+services:
+  - mongo
+
 default:
   before_script:
     - npm install
