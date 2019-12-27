@@ -28,14 +28,14 @@ app.use(notFound);
 
 app.use(handler);
 
-if (!fs.existsSync('server.key') || !fs.existsSync('server.cert')) {
+if (!fs.existsSync('server.key.pem') || !fs.existsSync('server.cert.pem')) {
   logger.warn("API didn't find SSL files.");
   process.exit(1);
 }
 
 const options = {
-  key: fs.readFileSync('server.key'),
-  cert: fs.readFileSync('server.cert'),
+  key: fs.readFileSync('server.key.pem'),
+  cert: fs.readFileSync('server.cert.pem'),
 };
 
 const runServer = () => https.createServer(options, app).listen(process.env.PORT, () => {
