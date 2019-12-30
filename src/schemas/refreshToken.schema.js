@@ -12,8 +12,9 @@ const refreshTokenSchema = new mongoose.Schema({
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
+    unique: false,
   },
-  userEmail: {
+  user: {
     type: 'String',
     unique: true,
     require: true,

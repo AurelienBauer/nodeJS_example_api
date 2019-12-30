@@ -1,23 +1,40 @@
 import jwt from 'jsonwebtoken';
 import moment from 'moment-timezone';
+import UserModel from '../models/user.model';
 
-function _token(email, expiresIn) {
-  return jwt.sign({
-    email,
+function _token(playload, expiresIn) {
+  const _playload = Object.assign(playload, {
     iat: moment().unix(),
-  }, process.env.JWT_SECRET, { expiresIn });
+  });
+  return jwt.sign(_playload, process.env.JWT_SECRET, { expiresIn });
 }
 
-const generateAccessToken = (email) => {
+const generateAccessToken = (playload) => {
   const expiresIn = moment().add(process.env.JWT_EXPIRATION_DELAY, 'hours');
-  const token = _token(email, expiresIn.unix());
+  const token = _token(playload, expiresIn.unix());
   return { token, expiresIn: expiresIn.toDate() };
 };
 
-const generateRefreshToken = (email) => {
+const generateRefreshToken = (playload) => {
   const expiresIn = moment().add(30, 'days').toDate();
-  const token = _token(email, 0);
+  const token = _token(playload, 0);
   return { token, expiresIn };
 };
 
-export { generateAccessToken, generateRefreshToken };
+const getTokenInformation = async (decodedToken) => {
+  if (decodedToken.isAUser) {
+    const user = await UserModel.getUserByEmail(decodedToken.email);
+    return {
+      type: 'user',
+      body: user,
+    };
+  }
+  return {
+    type: 'api',
+    body: {
+      name: decodedToken.apiName,
+    },
+  };
+};
+
+export { generateAccessToken, generateRefreshToken, getTokenInformation };

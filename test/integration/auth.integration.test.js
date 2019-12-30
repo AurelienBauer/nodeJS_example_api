@@ -61,7 +61,7 @@ describe('Authentication API Integration Tests', () => {
         });
     });
 
-    it('POST login  - Authentication has succeeded and return a token', (done) => {
+    it('POST login  - Authentication has succeeded and return a token for a USER', (done) => {
       agent.post('/auth/login')
         .set('Accept', 'application/json')
         .send({
@@ -82,26 +82,92 @@ describe('Authentication API Integration Tests', () => {
           done();
         });
     });
-  });
 
-  describe('POST refresh to get an access token', () => {
-    let refreshToken;
-
-    before((done) => {
+    it('POST login  -  Validation, test should fail because apiName in not known in config file for an API', (done) => {
       agent.post('/auth/login')
         .set('Accept', 'application/json')
         .send({
-          email: 'isAn@Email.yes',
-          password: 'goodpassword',
+          apiId: 'Mk&545XeL&Oea',
+          apiName: 'unknown_request',
+          password: 'Ck3q6R!2Dz0Wgo$Uv@tg7VqwM9cTzv5THSy%',
         })
         .end((err, res) => {
-          refreshToken = res.body.tokens.refreshToken.token;
+          expect(res.statusCode).to.equal(httpStatus.BAD_REQUEST);
+          expect(res.body.errors).to.be.an('array');
+          expect(res.body.errors.length).to.equal(1);
+          expect(res.body.errors[0].param).to.equal('apiName');
+          expect(res.body.errors[0].msg).to.equal('Invalid value');
+          expect(res.body.message).to.equal('Validation error');
+          expect(res.body.success).to.equal(false);
           done();
         });
     });
 
+    it('POST login  - should return UNAUTHORIZED because apiId is wrong', (done) => {
+      agent.post('/auth/login')
+        .set('Accept', 'application/json')
+        .send({
+          apiId: 'Unknown',
+          apiName: 'other_api',
+          password: 'Ck3q6R!2Dz0Wgo$Uv@tg7VqwM9cTzv5THSy%',
+        })
+        .end((err, res) => {
+          expect(res.statusCode).to.equal(httpStatus.UNAUTHORIZED);
+          expect(res.body.message).to.equal('Wrong apiId or password');
+          expect(res.body.success).to.equal(false);
+          done();
+        });
+    });
+
+    it('POST login  - Authentication has succeeded and return a token for an API', (done) => {
+      agent.post('/auth/login')
+        .set('Accept', 'application/json')
+        .send({
+          apiId: 'Mk&545XeL&Oea',
+          apiName: 'other_api',
+          password: 'Ck3q6R!2Dz0Wgo$Uv@tg7VqwM9cTzv5THSy%',
+        })
+        .end((err, res) => {
+          expect(res.statusCode).to.equal(httpStatus.OK);
+          expect(res.body).to.be.an('object');
+          expect(res.body.tokens).to.be.an('object');
+          expect(res.body.tokens.accessToken).to.be.a('object');
+          expect(res.body.tokens.accessToken.token).to.be.a('string');
+          expect(res.body.tokens.accessToken.expiresIn).to.be.a('string');
+          expect(res.body.tokens.refreshToken).to.be.a('object');
+          expect(res.body.tokens.refreshToken.token).to.be.a('string');
+          expect(res.body.tokens.refreshToken.expiresIn).to.be.a('string');
+          expect(res.body.success).to.equal(true);
+          done();
+        });
+    });
+  });
+
+  describe('POST refresh to get an access token', () => {
+    let refreshToken;
+    let apiRefreshToken;
+
+    before(async () => {
+      const user = await agent.post('/auth/login')
+        .set('Accept', 'application/json')
+        .send({
+          email: 'isAn@Email.yes',
+          password: 'goodpassword',
+        });
+      const api = await agent.post('/auth/login')
+        .set('Accept', 'application/json')
+        .send({
+          apiId: 'Mk&545XeL&Oea',
+          apiName: 'other_api',
+          password: 'Ck3q6R!2Dz0Wgo$Uv@tg7VqwM9cTzv5THSy%',
+        });
+      refreshToken = user.body.tokens.refreshToken.token;
+      apiRefreshToken = api.body.tokens.refreshToken.token;
+    });
+
+
     it('POST request access token without put the refreshToken in the body,'
-        + ' it should fail and return UNAUTHORIZED', (done) => {
+          + ' it should fail and return UNAUTHORIZED', (done) => {
       agent.post('/auth/refreshToken')
         .set('Accept', 'application/json')
         .send()
@@ -115,7 +181,7 @@ describe('Authentication API Integration Tests', () => {
     });
 
     it('POST request access token, but a wrong refreshToken is put in the body,'
-        + ' it should fail and return UNAUTHORIZED', (done) => {
+          + ' it should fail and return UNAUTHORIZED', (done) => {
       agent.post('/auth/refreshToken')
         .set('Accept', 'application/json')
         .send({
@@ -130,11 +196,29 @@ describe('Authentication API Integration Tests', () => {
     });
 
     it('POST request access token, the refreshToken put in the body is good,'
-          + ' it should success and return an access token', (done) => {
+          + ' it should success and return an access token for user token', (done) => {
       agent.post('/auth/refreshToken')
         .set('Accept', 'application/json')
         .send({
           refreshToken,
+        })
+        .end((err, res) => {
+          expect(res.statusCode).to.equal(httpStatus.OK);
+          expect(res.body.success).to.equal(true);
+          expect(res.body.tokens).to.be.an('object');
+          expect(res.body.tokens.accessToken).to.be.a('object');
+          expect(res.body.tokens.accessToken.token).to.be.a('string');
+          expect(res.body.tokens.accessToken.expiresIn).to.be.a('string');
+          done();
+        });
+    });
+
+    it('POST request access token, the refreshToken put in the body is good,'
+          + ' it should success and return an access token for api token', (done) => {
+      agent.post('/auth/refreshToken')
+        .set('Accept', 'application/json')
+        .send({
+          refreshToken: apiRefreshToken,
         })
         .end((err, res) => {
           expect(res.statusCode).to.equal(httpStatus.OK);
@@ -152,35 +236,43 @@ describe('Authentication API Integration Tests', () => {
       RefreshToken.updateOne({ token: refreshToken }, {
         expiresIn: '2000-01-23 11:29:14.794Z',
       }, () => {
-        agent.post('/auth/refreshToken')
-          .set('Accept', 'application/json')
-          .send({
-            refreshToken,
-          })
-          .end((err, res) => {
-            expect(res.statusCode).to.equal(httpStatus.UNAUTHORIZED);
-            expect(res.body.success).to.equal(false);
-            expect(res.body.message).to.equal('refreshToken expired');
-            done();
-          });
+        describe('POST login to get a token for USER', () => {
+          agent.post('/auth/refreshToken')
+            .set('Accept', 'application/json')
+            .send({
+              refreshToken,
+            })
+            .end((err, res) => {
+              expect(res.statusCode).to.equal(httpStatus.UNAUTHORIZED);
+              expect(res.body.success).to.equal(false);
+              expect(res.body.message).to.equal('refreshToken expired');
+              done();
+            });
+        });
       });
     });
   });
 
   describe('GET information about an authenticate user', () => {
     let token;
+    let apiToken;
 
-    before((done) => {
-      agent.post('/auth/login')
+    before(async () => {
+      const user = await agent.post('/auth/login')
         .set('Accept', 'application/json')
         .send({
           email: 'isAn@Email.yes',
           password: 'goodpassword',
-        })
-        .end((err, res) => {
-          token = res.body.tokens.accessToken.token;
-          done();
         });
+      const api = await agent.post('/auth/login')
+        .set('Accept', 'application/json')
+        .send({
+          apiId: 'Mk&545XeL&Oea',
+          apiName: 'other_api',
+          password: 'Ck3q6R!2Dz0Wgo$Uv@tg7VqwM9cTzv5THSy%',
+        });
+      token = user.body.tokens.accessToken.token;
+      apiToken = api.body.tokens.accessToken.token;
     });
 
     it('GET status should be rejected (no token send)', (done) => {
@@ -195,10 +287,33 @@ describe('Authentication API Integration Tests', () => {
 
     it('GET status should be rejected (wrong token send)', (done) => {
       agent.get('/auth/status')
+        .set('Authorization', 'Bearer')
+        .end((err, res) => {
+          expect(res.statusCode).to.equal(httpStatus.UNAUTHORIZED);
+          expect(res.body.message).to.equal('Token is not valid');
+          expect(res.body.success).to.equal(false);
+          done();
+        });
+    });
+
+    it('GET status should return user information', (done) => {
+      agent.get('/auth/status')
         .set('Authorization', `Bearer ${ token}`)
         .end((err, res) => {
           expect(res.statusCode).to.equal(httpStatus.OK);
-          expect(res.body.authUser).to.be.an('object');
+          expect(res.body.auth).to.be.an('object');
+          expect(res.body.status).to.equal('authenticated');
+          expect(res.body.success).to.equal(true);
+          done();
+        });
+    });
+
+    it('GET status should return api information', (done) => {
+      agent.get('/auth/status')
+        .set('Authorization', `Bearer ${ apiToken}`)
+        .end((err, res) => {
+          expect(res.statusCode).to.equal(httpStatus.OK);
+          expect(res.body.auth).to.be.an('object');
           expect(res.body.status).to.equal('authenticated');
           expect(res.body.success).to.equal(true);
           done();

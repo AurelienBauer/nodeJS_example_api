@@ -2,8 +2,8 @@ import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status';
 import moment from 'moment-timezone';
 import ErrorApi from '../services/ErrorApi.service';
-import UserModel from '../models/user.model';
 import RefreshToken from '../models/refreshToken.model';
+import { getTokenInformation } from '../services/auth.service';
 
 const checkToken = (req, res, next) => {
   let token = req.headers['x-access-token'] || req.headers.authorization;
@@ -19,8 +19,8 @@ const checkToken = (req, res, next) => {
           message: 'Token is not valid',
         }));
       }
-      const user = await UserModel.getUserByEmail(decoded.email);
-      req.user = user;
+      const info = await getTokenInformation(decoded);
+      req[info.type] = info.body;
       return next();
     });
   }
@@ -53,9 +53,8 @@ const checkRefreshToken = async (req, res, next) => {
     }
 
     const decoded = jwt.decode(refreshToken.token);
-    console.dir(decoded);
-    const user = await UserModel.getUserByEmail(decoded.email);
-    req.user = user;
+    const info = await getTokenInformation(decoded);
+    req[info.type] = info.body;
     return next();
   }
 

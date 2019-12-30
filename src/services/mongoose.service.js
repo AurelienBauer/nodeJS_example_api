@@ -6,7 +6,7 @@ if (process.env.NODE_ENV === 'development') {
   mongoose.set('debug', true);
 }
 
-const connectDb = () => mongoose.connect(process.env.MONGO_HOST,
+const connectDb = () => mongoose.connect(process.env.MONGO_HOST + process.env.PROJECT_NAME,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,

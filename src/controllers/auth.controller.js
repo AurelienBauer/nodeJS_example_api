@@ -3,40 +3,84 @@ import ErrorApi from '../services/ErrorApi.service';
 import RefreshToken from '../models/refreshToken.model';
 import { generateAccessToken } from '../services/auth.service';
 
-exports.login = async (req, res, next) => {
-  try {
-    const isAuthenticated = true; /* TODO: replace by your authentication system */
-    if (!isAuthenticated) {
-      return next(new ErrorApi({
-        status: httpStatus.UNAUTHORIZED,
-        message: 'Authentication Failure',
-      }));
+exports.login = [
+  async (req, res, next) => {
+    if (req.body.apiId && req.body.apiName) {
+      if (req.body.apiId !== process.env.CLIENT_SECRET_ID
+          || req.body.password !== process.env.API_PASSWORD) {
+        return next(new ErrorApi({
+          status: httpStatus.UNAUTHORIZED,
+          message: 'Wrong apiId or password',
+        }));
+      }
+      req.api = { name: req.body.apiName };
+      return next();
     }
 
-    const accessToken = generateAccessToken('useremail@shoul_be_unique.com');
-
-    const refreshToken = await RefreshToken.generateAndInsertRefreshToken({ email: 'useremail@shoul_be_unique.com' });
-    if (refreshToken instanceof ErrorApi) {
-      return next(refreshToken);
+    if (req.body.email) {
+      req.user = { email: 'useremail@shoul_be_unique.com' };
+      return next();
     }
 
-    return res.status(httpStatus.OK)
-      .json({
-        tokens: {
-          accessToken,
-          refreshToken,
-        },
-        message: 'Authentication successful!',
-        success: true,
-      });
-  } catch (err) {
-    return next(err);
-  }
-};
+    return next(new ErrorApi({
+      status: httpStatus.BAD_REQUEST,
+      message: 'A email or an apiId and apiName should be set in the body.',
+    }));
+  },
+
+  async (req, res, next) => {
+    try {
+      let playload;
+      if (req.api) {
+        playload = {
+          apiName: req.api.name,
+          isAUser: false,
+        };
+      } else {
+        playload = {
+          email: req.user.email,
+          isAUser: true,
+        };
+      }
+
+      const accessToken = generateAccessToken(playload);
+
+      const refreshToken = await RefreshToken.generateAndInsertRefreshToken(playload);
+      if (refreshToken instanceof ErrorApi) {
+        return next(refreshToken);
+      }
+
+      return res.status(httpStatus.OK)
+        .json({
+          tokens: {
+            accessToken,
+            refreshToken,
+          },
+          message: 'Authentication successful!',
+          success: true,
+        });
+    } catch (err) {
+      return next(err);
+    }
+  },
+];
 
 exports.refreshToken = (req, res, next) => {
   try {
-    const accessToken = generateAccessToken('useremail@shoul_be_unique.com');
+    let playload;
+    if (req.api) {
+      playload = {
+        apiName: req.api.name,
+        isAUser: false,
+      };
+    } else {
+      playload = {
+        email: req.user.email,
+        isAUser: true,
+      };
+    }
+
+    const accessToken = generateAccessToken(playload);
     return res.status(httpStatus.OK)
       .json({
         tokens: {
@@ -52,9 +96,10 @@ exports.refreshToken = (req, res, next) => {
 
 exports.status = (req, res, next) => {
   try {
+    const auth = (req.user) ? req.user : req.api;
     res.status(httpStatus.OK)
       .json({
-        authUser: req.user,
+        auth,
         status: 'authenticated',
         success: true,
       });
