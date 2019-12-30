@@ -1,0 +1,10 @@
+{
+  "env": {
+    "PORT": "3002",
+    "CLIENT_SECRET_ID": "2Mk&545XeL&Oea",
+    "API_PASSWORD": "2Ck3q6R!2Dz0Wgo$Uv@tg7VqwM9cTzv5THSy%",
+    "OTHER_API_URL": "https://localhost:3001",
+    "OTHER_API_SECRET_ID": "Mk&545XeL&Oea",
+    "OTHER_API_PASSWORD": "Ck3q6R!2Dz0Wgo$Uv@tg7VqwM9cTzv5THSy%"
+  }
+}

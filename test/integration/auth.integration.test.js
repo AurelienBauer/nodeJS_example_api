@@ -87,9 +87,9 @@ describe('Authentication API Integration Tests', () => {
       agent.post('/auth/login')
         .set('Accept', 'application/json')
         .send({
-          apiId: 'Mk&545XeL&Oea',
+          apiId: process.env.CLIENT_SECRET_ID,
           apiName: 'unknown_request',
-          password: 'Ck3q6R!2Dz0Wgo$Uv@tg7VqwM9cTzv5THSy%',
+          password: process.env.API_PASSWORD,
         })
         .end((err, res) => {
           expect(res.statusCode).to.equal(httpStatus.BAD_REQUEST);
@@ -109,7 +109,7 @@ describe('Authentication API Integration Tests', () => {
         .send({
           apiId: 'Unknown',
           apiName: 'other_api',
-          password: 'Ck3q6R!2Dz0Wgo$Uv@tg7VqwM9cTzv5THSy%',
+          password: process.env.API_PASSWORD,
         })
         .end((err, res) => {
           expect(res.statusCode).to.equal(httpStatus.UNAUTHORIZED);
@@ -123,9 +123,9 @@ describe('Authentication API Integration Tests', () => {
       agent.post('/auth/login')
         .set('Accept', 'application/json')
         .send({
-          apiId: 'Mk&545XeL&Oea',
+          apiId: process.env.CLIENT_SECRET_ID,
           apiName: 'other_api',
-          password: 'Ck3q6R!2Dz0Wgo$Uv@tg7VqwM9cTzv5THSy%',
+          password: process.env.API_PASSWORD,
         })
         .end((err, res) => {
           expect(res.statusCode).to.equal(httpStatus.OK);
@@ -157,9 +157,9 @@ describe('Authentication API Integration Tests', () => {
       const api = await agent.post('/auth/login')
         .set('Accept', 'application/json')
         .send({
-          apiId: 'Mk&545XeL&Oea',
+          apiId: process.env.CLIENT_SECRET_ID,
           apiName: 'other_api',
-          password: 'Ck3q6R!2Dz0Wgo$Uv@tg7VqwM9cTzv5THSy%',
+          password: process.env.API_PASSWORD,
         });
       refreshToken = user.body.tokens.refreshToken.token;
       apiRefreshToken = api.body.tokens.refreshToken.token;
@@ -267,9 +267,9 @@ describe('Authentication API Integration Tests', () => {
       const api = await agent.post('/auth/login')
         .set('Accept', 'application/json')
         .send({
-          apiId: 'Mk&545XeL&Oea',
+          apiId: process.env.CLIENT_SECRET_ID,
           apiName: 'other_api',
-          password: 'Ck3q6R!2Dz0Wgo$Uv@tg7VqwM9cTzv5THSy%',
+          password: process.env.API_PASSWORD,
         });
       token = user.body.tokens.accessToken.token;
       apiToken = api.body.tokens.accessToken.token;

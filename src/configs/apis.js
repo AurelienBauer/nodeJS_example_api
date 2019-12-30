@@ -9,8 +9,9 @@ const apisHosts = [
 
 const apis = {
   [OTHER_API]: {
-    host: process.env.OTHER_API_HOST,
-    clientId: process.env.OTHER_API_HOST,
+    name: OTHER_API,
+    url: process.env.OTHER_API_URL,
+    clientId: process.env.OTHER_API_SECRET_ID,
     password: process.env.OTHER_API_PASSWORD,
   },
 };
