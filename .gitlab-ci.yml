@@ -8,16 +8,16 @@ stages:
   - linter
   - test
 
-default:
+lint:
   before_script:
     - npm install
-
-lint:
   stage: linter
   script:
     - npm run lint
 
 integration:
+  before_script:
+    - npm install
   stage: test
   services:
     - mongo
